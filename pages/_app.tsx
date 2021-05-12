@@ -3,8 +3,8 @@ import { TinaCMS, TinaProvider } from 'tinacms'
 import {
   GithubClient,
   TinacmsGithubProvider,
-  GithubMediaStore,
 } from 'react-tinacms-github'
+import { NextS3MediaStore } from './next-s3-media-store'
 
 export default class Site extends App {
   cms: TinaCMS
@@ -34,7 +34,11 @@ export default class Site extends App {
       /**
        * 3. Register the Media Store
        */
-      media: new GithubMediaStore(github),
+      media: new NextS3MediaStore({
+        s3Bucket: process.env.S3_UPLOAD_BUCKET,
+        s3ReadUrl: process.env.S3_READ_URL,
+        s3ServerSideEncryption: process.env.S3_SERVER_SIDE_ENCRYPTION,
+      }),
       /**
        * 4. Use the Sidebar and Toolbar
        */
@@ -45,6 +49,7 @@ export default class Site extends App {
 
   render() {
     const { Component, pageProps } = this.props
+    pageProps.s3ReadUrl =  process.env.S3_READ_URL
     return (
       /**
        * 5. Wrap the page Component with the Tina and Github providers
